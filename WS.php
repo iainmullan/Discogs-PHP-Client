@@ -115,7 +115,7 @@ class WS
             'http'=>array(
                 'method' => 'GET',
                 'header' =>
-                    'Accept-Encoding: gzip, deflate\r\n' .
+                    'Accept-Encoding: x-gzip, deflate\r\n' .
                     'User-Agent: ' . $this->user_agent . "\r\n"
                 )));
     }
