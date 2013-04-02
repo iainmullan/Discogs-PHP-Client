@@ -25,58 +25,58 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-namespace Discogs;
-class Exception extends \Exception{}
+//namespace Discogs;
+//class Exception extends \Exception{}
 class WS
 {
     private $api_url = 'http://api.discogs.com/';
     private $user_agent;
-    
+
     /**
      * User agent should follow RFC 1945
      * (http://tools.ietf.org/html/rfc1945#section-3.7)
      *
-     * @param string $user_agent 
+     * @param string $user_agent
      */
     public function __construct($user_agent)
     {
         $this->user_agent = $user_agent;
     }
-    
+
     /**
      * @param integer $release_id
-     * @return stdClass 
+     * @return stdClass
      */
     public function release($release_id)
     {
-        $result = $this->parse(file_get_contents($this->api_url . 'release/' . 
+        $result = $this->parse(file_get_contents($this->api_url . 'release/' .
                 $release_id, false, $this->getContext()));
-        return $result->resp->release;
+        return $result['resp']['release'];
     }
-    
+
     /**
      * @param int $master_release_id
-     * @return stdClass 
+     * @return stdClass
      */
     public function masterRelease($master_release_id)
     {
-        $result = $this->parse(file_get_contents($this->api_url . 'master/' . 
+        $result = $this->parse(file_get_contents($this->api_url . 'master/' .
                 $master_release_id, false, $this->getContext()));
-        return $result->resp->master;
+        return $result['resp']['master'];
     }
-    
+
     /**
      * if $releases is true, will return the list of artist releases
-     * 
+     *
      * @param string $artist
      * @param bool $releases
-     * @return stdClass 
+     * @return stdClass
      */
     public function artist($artist, $releases = false)
     {
-        $result = $this->parse(file_get_contents($this->api_url . 'artist/' . 
-                urlencode($artist) . ($releases ? '?releases=1' : ''), false, 
-                $this->getContext()));       
+        $result = $this->parse(file_get_contents($this->api_url . 'artist/' .
+                urlencode($artist) . ($releases ? '?releases=1' : ''), false,
+                $this->getContext()));
         return $result->resp->artist;
     }
 
@@ -85,30 +85,30 @@ class WS
      *
      * @param string $label
      * @param bool $releases
-     * @return stdClass 
+     * @return stdClass
      */
     public function label($label, $releases = false)
     {
-        $result = $this->parse(file_get_contents($this->api_url . 'label/' . 
-                urlencode($label) . ($releases ? '?releases=1' : ''), false, 
+        $result = $this->parse(file_get_contents($this->api_url . 'label/' .
+                urlencode($label) . ($releases ? '?releases=1' : ''), false,
                 $this->getContext()));
         return $result->resp->label;
     }
-    
+
     /**
      * @param string $query
      * @param string $type  one off all, releases, artists, labels
      * @param int $page
-     * @return stdClass 
+     * @return stdClass
      */
     public function search($query, $type = 'all', $page = 1)
     {
-        $result = $this->parse(file_get_contents($this->api_url . 'search?q=' . 
-                urlencode($query) . '&type=' . $type . '&page=' . 
+        $result = $this->parse(file_get_contents($this->api_url . 'search?q=' .
+                urlencode($query) . '&type=' . $type . '&page=' .
                 (int)$page, false, $this->getContext()));
-        return $result->resp->search;        
+        return $result['resp']['search'];
     }
-    
+
     private function getContext()
     {
         return stream_context_create(array(
@@ -119,20 +119,20 @@ class WS
                     'User-Agent: ' . $this->user_agent . "\r\n"
                 )));
     }
-    
+
     private function parse($result)
     {
         if($result === false)
         {
             throw new Exception('could not retrieve response');
         }
-        $data = json_decode($result);
+        $data = json_decode($result, true);
         if(is_null($data))
         {
             throw new Exception('could not decode response');
         }
         return $data;
-    }    
+    }
 }
 
 if(!count(debug_backtrace()))
